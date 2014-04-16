@@ -13,6 +13,17 @@
   %\usepackage[orientation=portrait,size=a1,scale=1.4,grid,debug]{beamerposter}                  % e.g. for DIN-A1 poster, with optional grid and debug output
   %\usepackage[size=custom,width=200,height=120,scale=2,debug]{beamerposter}                     % e.g. for custom size poster
   %\usepackage[orientation=portrait,size=a0,scale=1.0,printer=rwth-glossy-uv.df]{beamerposter}   % e.g. for DIN-A0 poster with rwth-glossy-uv printer check
+
+\usepackage{natbib}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathpazo}
+
+
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+
+
   % ...
   %
   \title[Morfessor Model]{Morfessor Baseline Model}
@@ -22,87 +33,196 @@
 
 \newlength{\columnheight}
 \setlength{\columnheight}{105cm}
+\usetikzlibrary{positioning}
+\usetikzlibrary{fit}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes.geometric}
 
+\definecolor{myblue}{HTML}{86B0FF}
+\definecolor{mybluedark}{HTML}{3660CF}
+\definecolor{myorange}{HTML}{FFCB94}
+\definecolor{mygreen}{HTML}{A2C594}
+\definecolor{mygrey}{HTML}{737379}
+
+\definecolor{webgreen}{rgb}{0,.5,0}
+\definecolor{webbrown}{rgb}{.6,0,0}
+\definecolor{Maroon}{cmyk}{0, 0.87, 0.68, 0.32}
+\definecolor{RoyalBlue}{cmyk}{1, 0.50, 0, 0}
+
+\usepackage{textcomp}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\ind}{I}
+\DeclareMathOperator*{\sign}{sign}
+
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\mbf}[1]{\boldsymbol{#1}}
+\newcommand{\seq}[1]{\boldsymbol{#1}}
+\newcommand{\dom}[1]{\mathcal{#1}}
+\newcommand{\txt}[1]{\textrm{#1}}
+
+\newcommand{\len}[1]{\lvert#1\rvert}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+
+\newcommand{\cost}{L}
+\newcommand{\model}{\mathcal{M}}
+\newcommand{\params}{\boldsymbol{\theta}}
+\newcommand{\hparams}{\boldsymbol{\hat{\theta}}}
+\newcommand{\tparams}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\paramspace}{\Theta}
+\newcommand{\data}{\seq{D}}
+\newcommand{\hatdata}{\seq{\hat{D}}}
+\newcommand{\traindata}{\seq{D_{\txt{train}}}}
+\newcommand{\testdata}{\seq{D_{\txt{test}}}}
+\newcommand{\grammar}{\mathcal{G}}
+\newcommand{\lexicon}{\mathcal{L}}
+\newcommand{\corpus}{\textrm{corpus}}
+
+%\newcommand{\word}{\phi^{-1}}
+\newcommand{\detoken}{\phi^{-1}}
+\newcommand{\token}{\phi}
+\newcommand{\tokenset}{\Phi}
+\newcommand{\bound}{\#}
+
+\newcommand{\vb}{\,|\,}
+
+\newcommand{\X}{\mat{X}}
+\newcommand{\Y}{\mat{Y}}
+\newcommand{\Z}{\mat{Z}}
 
   \begin{document}
   \begin{frame}{Morfessor 2.0: Toolkit for Statistical Morphological Segmentation -- Model} 
 \begin{columns}
 
-\begin{column}{.3\textwidth}
+\begin{column}{.4\textwidth}
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Introduction}
               \begin{itemize}
-              \item Most face recognition approaches are sensitive to registration errors
-                \begin{itemize}
-                \item rely on a very good initial alignment and illumination
-                \end{itemize}
-              \item We propose/analyze:
-                \begin{itemize}
-                \item grid-based and dense extraction of local features
-                \item block-based matching accounting for different\\
-	                  viewpoints and registration errors
-                \end{itemize}
+              \item Unsupervised
+		\item Statistical
+		\item Morphological segmentation
+              \end{itemize}              
+Full description in  \citep{virpioja2013morfessor}    
+        \end{block}
+            
+
+	\end{beamercolorbox}
+
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Model}
+              \begin{itemize}
+              \item Generative model\\
+$p(A, W \vb \params)$
+		\item Tokenization function\\
+ $\seq{a} = \token(\seq{w}; \params)$
+		\item Cost derivation\\
+\begin{align*}\params_{\txt{MAP}}%&= \argmax_{\params} p(\params \vb \data_W)\\
+&= \argmax_{\params} p(\params) p(\data_W \vb \params)\\
+\cost(\params, \data_W) &= -\log p(\params) - \log p(\data_W \vb \params)
+\end{align*}
               \end{itemize}              
             \end{block}
             
 	\end{beamercolorbox}
+
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Data Likelihood}
+\begin{align*}
+  \log p(\data_W \vb \params)
+  & = \sum_{j=1}^{N} \log p(W=\seq{w}_j \vb \params) \nonumber \\
+  & = \sum_{j=1}^{N} \log \sum_{\seq{a} \in \tokenset(\seq{w}_j)}
+  p(A=\seq{a} \vb \params),
+\end{align*}
+ Morfessor selects only one analysis at a time, by introducing a hidden variable $\Y$. Given the analyses for
+all words in the data, $\Y = (\seq{y}_1, \ldots, \seq{y}_N)$,
+\begin{align*}
+  \log p(\data_W \vb \params, \Y)
+  & = \sum_{j=1}^{N} \log 
+  p(y_j \vb \params) 
+  \\&= \sum_{j=1}^{N} \log 
+  p(m_{j1}, \ldots, m_{j\len{\seq{y}_j}}, \bound_w \vb \params) 
+\label{eq:morphylikelihood}
+\end{align*}
+
+            \end{block}
+	\end{beamercolorbox}
+
+
+
+
+
 \end{column}
 
 \begin{column}{.3\textwidth}
-  \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
- \begin{block}{Introduction}
-              \begin{itemize}
-              \item Most face recognition approaches are sensitive to registration errors
-                \begin{itemize}
-                \item rely on a very good initial alignment and illumination
-                \end{itemize}
-              \item We propose/analyze:
-                \begin{itemize}
-                \item grid-based and dense extraction of local features
-                \item block-based matching accounting for different\\
-	                  viewpoints and registration errors
-                \end{itemize}
-              \end{itemize}              
+
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Prior}
+\begin{align*}
+p(\params) & = p(\lexicon)\\ &= p(\mu) \times p(\txt{properties}(m_1), \ldots, \\&\txt{properties}(m_{\mu})) \times \mu!.
+\end{align*}
+
+\begin{equation*}
+  p(\seq{\sigma}_i) = p(L=\len{\seq{\sigma}_i})
+  \prod_{j=1}^{\len{\seq{\sigma}_i}} p(C=\seq{\sigma}_{ij})
+\end{equation*}
+
             \end{block}
-            
 	\end{beamercolorbox}
+
 \vfill
+
+
+
   \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
- \begin{block}{Introduction}
-              \begin{itemize}
-              \item Most face recognition approaches are sensitive to registration errors
-                \begin{itemize}
-                \item rely on a very good initial alignment and illumination
-                \end{itemize}
-              \item We propose/analyze:
-                \begin{itemize}
-                \item grid-based and dense extraction of local features
-                \item block-based matching accounting for different\\
-	                  viewpoints and registration errors
-                \end{itemize}
-              \end{itemize}              
-            \end{block}
+ \begin{block}{Workflow}
+\tikzstyle{sbox} = [draw, thin, fill=myblue!50,
+  text width=14em, text centered, node distance=2.0cm]
+\tikzstyle{sabox} = [draw, thin, dashed, fill=myblue!50,
+  text width=14em, text centered, node distance=2.0cm]
+\tikzstyle{dbox} = [draw, rounded corners=.8ex, text width=8em, text centered, node distance=2.0cm]
+\tikzstyle{dabox} = [draw, dashed, rounded corners=.8ex, text width=8em, text centered, node distance=2.0cm]
+\tikzstyle{nobox} = [text width=8em, text centered, node distance=2.0cm]
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[yscale=2,thick,>=latex]
+\node[dbox] (traindata) at (0,0) {Training data compounds $\data_W$};
+\node[sbox] (training) [right=of traindata] {(1) Model training: \\ $\argmin_{\params} L(\data_W, \data_{W \to A}, \params)$};
+\node[dabox] (annottraindata) at (0,2) {Annotated training data $\data_{W \to A}$};
+\node[sbox] (tokenization) [below=of training] {(2) Decoding:\\ $A = \token(W; \params)$};
+\node[dbox] (testdata) [left=of tokenization] {Test data compounds};
+\node[dbox] (testconstr) [below=of tokenization] {Test data constructions};
+\draw[->] (traindata) to node [above] {$W$} (training);
+\draw[->,dashed] (annottraindata.east) to node [above] {$W, A$} (training);
+\draw[->] (training) to node [right] {$\params$} (tokenization);
+\draw[->] (testdata) to node [above] {$W$} (tokenization);
+\draw[->] (tokenization) to node [right] {$A$} (testconstr);
+
+%\node[sabox] (dtokenization) [above=of training] {Decoding: $A = \token(\hat{W}; \params)$};
+%\node[dabox,text width=10em] (develdata) [above=of dtokenization] {Annotated development data $\hatdata_{W \to A}$};
+%\node[sabox,text width=6em] (eval) [right=of dtokenization] {Evaluation: $S = d(A, \hat{A})$};
+%\draw[->,dashed] (develdata) to node [right] {$\hat{W}$} (dtokenization);
+%\draw[->,dashed] (develdata) to node [above] {$\hat{A}$} (eval);
+%\draw[->,dashed] (training) to node [right] {$\params$} (dtokenization);
+%\draw[->,dashed] (dtokenization) to node [above] {$A$} (eval);
+%\draw[->,dashed] (eval.south) to node [above] {$S$} (training.east);
+\end{tikzpicture}}            \end{block}
             
 	\end{beamercolorbox}
 \end{column}
 \begin{column}{.3\textwidth}
+
   \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
- \begin{block}{Introduction}
-              \begin{itemize}
-              \item Most face recognition approaches are sensitive to registration errors
-                \begin{itemize}
-                \item rely on a very good initial alignment and illumination
-                \end{itemize}
-              \item We propose/analyze:
-                \begin{itemize}
-                \item grid-based and dense extraction of local features
-                \item block-based matching accounting for different\\
-	                  viewpoints and registration errors
-                \end{itemize}
-              \end{itemize}              
+ \begin{block}{References}
+\footnotesize
+             \bibliographystyle{apalike} %plain
+\bibliography{report}
+           
             \end{block}
             
 	\end{beamercolorbox}
+
+
 \end{column}
 
 \end{columns}
