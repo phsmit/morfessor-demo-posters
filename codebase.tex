@@ -24,6 +24,65 @@
 \setlength{\columnheight}{105cm}
 
 
+\usetikzlibrary{positioning}
+\usetikzlibrary{fit}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes.geometric}
+
+\definecolor{myblue}{HTML}{86B0FF}
+\definecolor{mybluedark}{HTML}{3660CF}
+\definecolor{myorange}{HTML}{FFCB94}
+\definecolor{mygreen}{HTML}{A2C594}
+\definecolor{mygrey}{HTML}{737379}
+
+\definecolor{webgreen}{rgb}{0,.5,0}
+\definecolor{webbrown}{rgb}{.6,0,0}
+\definecolor{Maroon}{cmyk}{0, 0.87, 0.68, 0.32}
+\definecolor{RoyalBlue}{cmyk}{1, 0.50, 0, 0}
+
+\usepackage{textcomp}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\ind}{I}
+\DeclareMathOperator*{\sign}{sign}
+
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\mbf}[1]{\boldsymbol{#1}}
+\newcommand{\seq}[1]{\boldsymbol{#1}}
+\newcommand{\dom}[1]{\mathcal{#1}}
+
+
+\newcommand{\len}[1]{\lvert#1\rvert}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+
+\newcommand{\cost}{L}
+\newcommand{\model}{\mathcal{M}}
+\newcommand{\params}{\boldsymbol{\theta}}
+\newcommand{\hparams}{\boldsymbol{\hat{\theta}}}
+\newcommand{\tparams}{\boldsymbol{\tilde{\theta}}}
+\newcommand{\paramspace}{\Theta}
+\newcommand{\data}{\seq{D}}
+\newcommand{\hatdata}{\seq{\hat{D}}}
+\newcommand{\traindata}{\seq{D_{\txt{train}}}}
+\newcommand{\testdata}{\seq{D_{\txt{test}}}}
+\newcommand{\grammar}{\mathcal{G}}
+\newcommand{\lexicon}{\mathcal{L}}
+\newcommand{\corpus}{\textrm{corpus}}
+
+%\newcommand{\word}{\phi^{-1}}
+\newcommand{\detoken}{\phi^{-1}}
+\newcommand{\token}{\phi}
+\newcommand{\tokenset}{\Phi}
+\newcommand{\bound}{\#}
+
+\newcommand{\vb}{\,|\,}
+
+\newcommand{\X}{\mat{X}}
+\newcommand{\Y}{\mat{Y}}
+\newcommand{\Z}{\mat{Z}}
+
   \begin{document}
   \begin{frame}{Morfessor 2.0: Toolkit for Statistical Morphological Segmentation -- Codebase} 
 \begin{columns}
@@ -31,23 +90,31 @@
 \begin{column}{.3\textwidth}
 
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
- \begin{block}{Morfessor implementations}
-              \begin{itemize}
-              \item Morfessor 1.0
+ \begin{block}{Previous: Morfessor 1.0}
                 \begin{itemize}
                 \item Written in perl
 		\item Limited utf-8 support
 		\item Older codebase, unsuitable for extensions
-                \end{itemize}
-              \item Morfessor 2.0
-              \end{itemize}              
+
+                \end{itemize}          
+            \end{block}
+            
+	\end{beamercolorbox}
+
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Morfessor 2.0}
+                \begin{itemize}
+                \item Complete rewrite
+		\item Inclusion of many previously published features
+		\item Extensible for newer features and and algorithms
+                \end{itemize}          
             \end{block}
             
 	\end{beamercolorbox}
 
 
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
- \begin{block}{Features}
+ \begin{block}{Usage}
               \begin{itemize}
               \item Library interface
                 \begin{itemize}
@@ -62,9 +129,34 @@
             \end{block}
             
 	\end{beamercolorbox}
+\vfill
+
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Features}
+              \begin{itemize}
+              \item On-line training
+	      \item Training speed-up with random skips
+	      \item Frequency threshold and dampening for words in training data
+		\item Possibility to weight training data likelihoods
+		\item Optimization of data likelihood weight based on development set
+		\item \textcolor{mygrey}{Optimization of data likelihood weight based on average morph type length}
+		\item \textcolor{mygrey}{Optimization of data likelihood weight based on average morphs / word}
+              \end{itemize}              
+
+		{\small \textcolor{mygrey}{Items in grey will be released in Morfessor 2.1}}
+            \end{block}
+            
+	\end{beamercolorbox}
+
+\vfill
+
+
+
+
 \end{column}
 
 \begin{column}{.3\textwidth}
+
   \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Implementation}
               \begin{itemize}
@@ -82,19 +174,8 @@
             \end{block}
             
 	\end{beamercolorbox}
-\vfill
-  \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
- \begin{block}{Distribution}
-              \begin{itemize}
-              \item Source code availabe at GitHub
-		\item Packages available from the PYthon Package Index
-              \item BSD Open Source License
-\end{itemize}
-            \end{block}
-            
-	\end{beamercolorbox}
-\end{column}
-\begin{column}{.3\textwidth}
+
+
   \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Demo code}
               \begin{itemize}
@@ -115,28 +196,111 @@
 
 
 
+  \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Distribution}
+              \begin{itemize}
+              \item Source code availabe at GitHub
+		\item Packages available from the PYthon Package Index
+              \item BSD Open Source License
+\end{itemize}
+            \end{block}
+            
+	\end{beamercolorbox}
+
+
+  \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Upcoming developments}
+              \begin{itemize}
+		\item Morfessor 2.0 based model with morphotactic constraints (categories): FlatCat 
+              \item Data selection techniques
+		
+\end{itemize}
+            \end{block}
+            
+	\end{beamercolorbox}
+	  \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+	 \begin{block}{Acknowledgements}
+\footnotesize
+The authors have received funding from the
+EC's 7th Framework Programme (FP7/2007--2013)
+under
+grant agreement n\textdegree 287678 and the Academy of Finland under
+the Finnish Centre of Excellence Program 2012--2017 (grant
+n\textdegree251170) and the LASTU Programme (grants n\textdegree256887 and 259934). 
+The experiments were performed using computer resources within the Aalto University School of Science "Science-IT" project.    
+	            \end{block}
+	            
+		\end{beamercolorbox}
+
+
+\end{column}
+\begin{column}{.35\textwidth}
+
+
+  \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{}
+\tikzstyle{databox} = [fill=myblue!50,draw, thin, text centered, text width=8em,minimum height=1.5em]
+\tikzstyle{toolbox} = [draw, thin, text centered, text width =8em, rounded corners=.8ex,minimum height=3em]
+\tikzstyle{modebox} = [draw, text centered, thick, text width=6em]
+\tikzstyle{resubox} = [text centered, text width=8em, fill=gray!30]
+
+
+\begin{tikzpicture}[scale=0.5,xscale=4,yscale=3,thick,>=latex]
+\node[databox] (traindata) at (0,0) {Training data};
+\node[databox, dashed] (annodata) at (4,0) {Annotation data};
+
+\node[toolbox, text width=12em, minimum height=2em] (morftrain) at (2,-2) {\texttt{morfessor-train}};
+\node[modebox] (morfmodel) at (2,-4) {Morfessor model};
+
+\node[databox] (testdata) at (4,-6) {Corpus};
+\node[databox] (goldstd) at (0,-6)  {Gold standard};
+
+\node[toolbox] (morfsegment) at (4,-8) {\texttt{morfessor- segment}};
+\node[toolbox] (morfevaluate) at (0,-8) {\texttt{morfessor- evaluate}};
+
+\node[resubox] (segmented) at (4,-10) {Segmented corpus};
+\node[resubox] (bprscore) at (0,-10) {BPR-scores};
+
+\draw[->] (traindata) to (traindata.south |- morftrain.north);
+\draw[->,dashed] (annodata) -- (annodata.south |- morftrain.north);
+
+\draw[->] (morftrain) -- (morfmodel);
+
+\draw[-] (morfmodel) to (2,-8);
+\draw[->] (2,-8) to (morfsegment);
+\draw[->] (2,-8) to (morfevaluate);
+
+\draw[->] (testdata) to (morfsegment);
+\draw[->] (goldstd) to (morfevaluate);
+
+
+\draw[->] (morfsegment) to (segmented);
+\draw[->] (morfevaluate) to (bprscore);
+
+\end{tikzpicture}
+            \end{block}
+            
+	\end{beamercolorbox}
+
+
+
 	  \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
 	 \begin{block}{Links}
 	              \begin{itemize}
-			\item Homepage
-	                \begin{itemize}
-	                \item \url{http://www.cis.hut.fi/projects/morpho/}
-	                \end{itemize}
-	\item GitHub
-	                \begin{itemize}
-	                \item \url{https://github.com/aalto-speech/morfessor} 
-	                \end{itemize}
+			\item Homepage \\
+	                \url{http://www.cis.hut.fi/projects/morpho/}
 
-	              \item Pypi
-	                \begin{itemize}
-	                \item \texttt{pip install morfessor}
-\item \url{https://pypi.python.org/pypi/Morfessor} 
-	                \end{itemize}
+	\item GitHub\\
+\url{https://github.com/aalto-speech/morfessor} 
+
+
+	              \item Pypi\\ \texttt{pip install morfessor} \\
+\url{https://pypi.python.org/pypi/Morfessor} 
+
 
 	              \item Documentation 
-	                \begin{itemize}
-	                \item \url{http://morfessor.readthedocs.org/en/latest/} 
-	                \end{itemize}
+	                \\ {\small \url{http://morfessor.readthedocs.org/en/latest/} }
+	                
 %	
 %			
 %	
@@ -144,6 +308,12 @@
 	            \end{block}
 	            
 		\end{beamercolorbox}
+
+
+
+
+
+
 
 
 \end{column}
