@@ -9,7 +9,7 @@
   %\usepackage{times}\usefonttheme{professionalfonts}  % times is obsolete
   \usefonttheme[onlymath]{serif}
   \boldmath
-  \usepackage[orientation=landscape,size=a2,scale=1.0,grid,debug]{beamerposter}                       % e.g. for DIN-A0 poster
+  \usepackage[orientation=landscape,size=a2,scale=0.9,grid,debug]{beamerposter}                       % e.g. for DIN-A0 poster
   %\usepackage[orientation=portrait,size=a1,scale=1.4,grid,debug]{beamerposter}                  % e.g. for DIN-A1 poster, with optional grid and debug output
   %\usepackage[size=custom,width=200,height=120,scale=2,debug]{beamerposter}                     % e.g. for custom size poster
   %\usepackage[orientation=portrait,size=a0,scale=1.0,printer=rwth-glossy-uv.df]{beamerposter}   % e.g. for DIN-A0 poster with rwth-glossy-uv printer check
@@ -174,6 +174,37 @@ p(\params) & = p(\lexicon)\\ &= p(\mu) \times p(\txt{properties}(m_1), \ldots, \
 
 \vfill
 
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Algorithm}
+\begin{algorithmic}
+  \Function{LocalBatchTrain}{$\data_W$, $\epsilon$}
+  \State $\params, \Y \gets \textsc{InitModel}(\data_W)$ 
+  \State $L_{\txt{old}} \gets \infty$
+  \State $L_{\txt{new}} \gets L(\data_W, \params, \Y)$
+  \While{$L_{\txt{new}} < L_{\txt{old}} - \epsilon$}
+  \State $\seq{J} \gets \textsc{RandomPermutation}(1, \ldots, N)$
+  \For{$j \in \seq{J}$}
+  \State $\params, \Y \gets \textsc{LocalSearch}(\seq{w}_j, \data_W, \params, \Y)$
+  %\State $\Y[\seq{w}_j] \gets \textsc{LocalSearch}(\seq{w}_j, \data_W, \params, \Y)$
+  %\State $\params \gets \argmin_{\params}  L(\data_W, \params, \Y)$
+  \EndFor
+  \State $L_{\txt{old}} \gets L_{\txt{new}}$
+  \State $L_{\txt{new}} \gets L(\data_W, \params, \Y)$
+  \EndWhile
+  \State \Return $\params$, $\Y$
+  \EndFunction
+\end{algorithmic}
+
+
+            \end{block}
+	\end{beamercolorbox}
+
+\vfill
+
+
+
+
+
 
 
   \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
@@ -225,8 +256,51 @@ p(\params) & = p(\lexicon)\\ &= p(\mu) \times p(\txt{properties}(m_1), \ldots, \
 
 
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
- \begin{block}{Likelihood weighting and Semi-supervised training }
+ \begin{block}{Algorithm}
+\tikzstyle{morph} = [rectangle, draw, thin, text centered, node distance=1.0cm, minimum size=0.6cm, rounded corners=.8ex, fill=myorange!60]
+\tikzstyle{morph2} = [rectangle, draw, thin, dashed, text centered, node distance=1.0cm, minimum size=0.6cm, rounded corners=.8ex, fill=myorange!60]
+\tikzstyle{hidden} = [node distance=1.0cm, minimum size=0.6cm]
+\resizebox{0.85\textwidth}{!}{
+\begin{tikzpicture}[scale=1.0,thick,>=latex,->]
+\node[hidden] (top1) at (0,0) {};
+\node[hidden] (top2) [right=4.5cm of top1] {};
+\node[morph2] (unmatched) [below=of top1] {un+matched (1, 1)};
+\node[morph2] (matchboxes) [below=of top2] {match+boxes (1, 1)};
+\node[morph2] (matched) [below=of unmatched] {match+ed (1, 2)};
+\node[morph] (un) [left=of matched] {\bf un (0, 1)};
+\node[morph2] (boxes) [below=of matchboxes] {box+es (2, 3)};
+\node[morph] (match) [below=of matched] {\bf match (5, 8)};
+\node[morph] (ed) [right=of match] {\bf ed (0, 2)};
+\node[morph] (box) [below=of boxes] {\bf box (7, 10)};
+\node[morph] (es) [right=of box] {\bf es (0, 3)};
+\path (unmatched) edge node {} (un); 
+\path (unmatched) edge node {} (matched); 
+\path (matchboxes) edge node {} (match); 
+\path (matchboxes) edge node {} (boxes); 
+\path (boxes) edge node {} (box); 
+\path (boxes) edge node {} (es); 
+\path (matched) edge node {} (match); 
+\path (matched) edge node {} (ed); 
+\path (top1) edge node {} (unmatched); 
+\path (top2) edge node {} (matchboxes); 
+\end{tikzpicture}
+}
+            \end{block}
+	\end{beamercolorbox}
 
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+ \begin{block}{Likelihood weighting and Semi-supervised training }
+Likelihood weighting with $\alpha$ \citep{kohonen2010semisupervised,virpioja2011nodalida}
+\begin{align*}
+  \cost(\params, \data_W) =& - \log p(\params) \\&- \alpha \log p(\data_W
+  \vb \params)
+\end{align*}
+
+Semi-supervised \citep{kohonen2010semisupervised}
+\begin{align*}
+  \cost(\params, \data_W) = & - \log p(\params) \\&- \alpha \log p(\data_W
+  \vb \params) \\&- \beta \log p(\data_{W \to A} \vb \params).
+\end{align*}
 
             \end{block}
 	\end{beamercolorbox}
