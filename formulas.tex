@@ -119,9 +119,9 @@ $p(\underset{analyses}{A}, \underset{words}{W} \vb \underset{parameters}{\params
 		\item Tokenization function\\
  $\seq{a} = \token(\seq{w}; \params)$
 		\item Cost derivation\\
-\begin{align*}\params_{\txt{MAP}}%&= \argmax_{\params} p(\params \vb \data_W)\\
-&= \argmax_{\params} p(\params) p(\underset{data}{\data_W} \vb \params)\\
-\cost(\params, \data_W) &= -\log \underset{prior}{p(\params)} - \log \underset{data\,likelihood}{p(\data_W \vb \params)}
+\begin{align*}\params_{\txt{MAP}}%&= \argmax_{\params} p(\params \vb \data)\\
+&= \argmax_{\params} p(\params) p(\underset{data}{\data} \vb \params)\\
+\cost(\params, \data) &= -\log \underset{prior}{p(\params)} - \log \underset{data\,likelihood}{p(\data \vb \params)}
 \end{align*}
               \end{itemize}              
             \end{block}
@@ -131,14 +131,17 @@ $p(\underset{analyses}{A}, \underset{words}{W} \vb \underset{parameters}{\params
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Data Likelihood}
 \begin{align*}
-  \log p(\data_W \vb \params)
+  \log p(\data \vb \params)
   & = \sum_{j=1}^{N} \log p(W=\seq{w}_j \vb \params) \nonumber \\
   & = \sum_{j=1}^{N} \log \sum_{\seq{a} \in \tokenset(\seq{w}_j)}
   p(A=\seq{a} \vb \params),
 \end{align*}
- Morfessor selects only one analysis for each word at a time, by introducing a hidden variable $\Y$. 
+
+Morfessor Baseline assumes independence of words. Also, only valid tokenisations of need to be considered.
+
+Morfessor selects only one tokenisation (analysis) for each word at a time, by introducing a hidden variable $\Y$. 
 \begin{align*}
-  \log p(\data_W \vb \params, \Y)
+  \log p(\data \vb \params, \Y)
   & = \sum_{j=1}^{N} \log 
   p(y_j \vb \params) 
   \\&= \sum_{j=1}^{N} \log 
@@ -183,7 +186,6 @@ $p(\underset{analyses}{A}, \underset{words}{W} \vb \underset{parameters}{\params
             \end{block}
 	\end{beamercolorbox}
 
-hi
 \end{column}
 
 \begin{column}{.3\textwidth}
@@ -191,10 +193,10 @@ hi
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Prior}
 \begin{align*}
-p(\params) & = p(\underset{lexicon}{\lexicon})p(\underset{\grammar})
+p(\params) & = p(\underset{lexicon}{\lexicon})p(\underset{grammar}{\grammar})
 \end{align*}
 
-Morfessor has no grammar, only a prior over the lexicon
+Morfessor Baseline has no grammar, only a prior over the lexicon
 
 \begin{align*}
 p(\params)  =& p(\underset{\#morphs}{\mu}) \times\\& p(\txt{properties}(m_1), \ldots, \\&\txt{properties}(m_{\mu})) \times  \\ &\underset{\#morph\,permutations}{\mu!}.
@@ -213,19 +215,19 @@ p(\params)  =& p(\underset{\#morphs}{\mu}) \times\\& p(\txt{properties}(m_1), \l
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Algorithm}
 \begin{algorithmic}
-  \Function{LocalBatchTrain}{$\data_W$, $\epsilon$}
+  \Function{LocalBatchTrain}{$\data$, $\epsilon$}
   \State $\params, \Y \gets \textsc{InitModel}(\data_W)$ 
   \State $L_{\txt{old}} \gets \infty$
   \State $L_{\txt{new}} \gets L(\data_W, \params, \Y)$
   \While{$L_{\txt{new}} < L_{\txt{old}} - \epsilon$}
   \State $\seq{J} \gets \textsc{RandomPermutation}(1, \ldots, N)$
   \For{$j \in \seq{J}$}
-  \State $\params, \Y \gets \textsc{LocalSearch}(\seq{w}_j, \data_W, \params, \Y)$
-  %\State $\Y[\seq{w}_j] \gets \textsc{LocalSearch}(\seq{w}_j, \data_W, \params, \Y)$
-  %\State $\params \gets \argmin_{\params}  L(\data_W, \params, \Y)$
+  \State $\params, \Y \gets \textsc{LocalSearch}(\seq{w}_j, \data, \params, \Y)$
+  %\State $\Y[\seq{w}_j] \gets \textsc{LocalSearch}(\seq{w}_j, \data, \params, \Y)$
+  %\State $\params \gets \argmin_{\params}  L(\data, \params, \Y)$
   \EndFor
   \State $L_{\txt{old}} \gets L_{\txt{new}}$
-  \State $L_{\txt{new}} \gets L(\data_W, \params, \Y)$
+  \State $L_{\txt{new}} \gets L(\data, \params, \Y)$
   \EndWhile
   \State \Return $\params$, $\Y$
   \EndFunction
@@ -254,8 +256,8 @@ p(\params)  =& p(\underset{\#morphs}{\mu}) \times\\& p(\txt{properties}(m_1), \l
 %\tikzstyle{nobox} = [text width=8em, text centered, node distance=2.0cm]
 %\resizebox{\textwidth}{!}{
 %\begin{tikzpicture}[yscale=2,thick,>=latex]
-%\node[dbox] (traindata) at (0,0) {Training data compounds $\data_W$};
-%\node[sbox] (training) [right=of traindata] {(1) Model training: \\ $\argmin_{\params} L(\data_W, \data_{W \to A}, \params)$};
+%\node[dbox] (traindata) at (0,0) {Training data compounds $\data$};
+%\node[sbox] (training) [right=of traindata] {(1) Model training: \\ $\argmin_{\params} L(\data, \data_{A}, \params)$};
 %\node[dabox] (annottraindata) at (0,2) {Annotated training data $\data_{W \to A}$};
 %\node[sbox] (tokenization) [below=of training] {(2) Decoding:\\ $A = \token(W; \params)$};
 %\node[dbox] (testdata) [left=of tokenization] {Test data compounds};
@@ -297,16 +299,16 @@ p(\params)  =& p(\underset{\#morphs}{\mu}) \times\\& p(\txt{properties}(m_1), \l
  \begin{block}{Likelihood weighting and Semi-supervised training }
 Likelihood weighting with $\alpha$ \citep{kohonen2010semisupervised,virpioja2011nodalida}
 \begin{align*}
-  \cost(\params, \data_W) =& - \log p(\params) \\&- \alpha \log p(\data_W
+  \cost(\params, \data) =& - \log p(\params) \\&- \alpha \log p(\data
   \vb \params)
 \end{align*}
 
 $\alpha$ can be determined in different ways, e.g using a development set, or some explicit knowledge like average morph length. Higher $\alpha$ reduces segmentation, lower $\alpha$ increases segmentation.
 
-Semi-supervised \citep{kohonen2010semisupervised}
+Semi-supervised \citep{kohonen2010sigmorphon}
 \begin{align*}
-  \cost(\params, \data_W) = & - \log p(\params) \\&- \alpha \log p(\data_W
-  \vb \params) \\&- \beta \log p(\data_{W \to A} \vb \params).
+  \cost(\params, \data) = & - \log p(\params) \\&- \alpha \log p(\data
+  \vb \params) \\&- \beta \log p(\underset{annotated\,data}{\data_{A}} \vb \params).
 \end{align*}
 
 For semi-supervised learning another term is added to the cost, the likelihood of a set of annotations coming from the model. Also here a weight $\beta$ is introduced to control the effect.
