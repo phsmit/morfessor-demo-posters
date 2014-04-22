@@ -166,14 +166,14 @@ Morfessor selects only one tokenisation (analysis) for each word at a time, by i
 
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Prior}
-\begin{align*}
-p(\params) & = p(\underset{lexicon}{\lexicon})p(\underset{grammar}{\grammar})
-\end{align*}
+%\begin{align*}
+%p(\params) & = p(\underset{lexicon}{\lexicon})p(\underset{grammar}{\grammar})
+%\end{align*}
 
-Morfessor Baseline has no grammar, only a prior over the lexicon
+The parameters of Morfessor Baseline encode the properties of the morph lexicon:
 
 \begin{align*}
-p(\params)  =& p(\underset{\#morphs}{\mu}) \times\\& p(\txt{properties}(m_1), \ldots, \\&\txt{properties}(m_{\mu})) \times  \\ &\underset{\#morph\,permutations}{\mu!}.
+p(\params)  =& p(\underset{\#morphs}{\mu}) \times \underset{\#morph\,permutations}{\mu!} \times\\& p(\txt{properties}(m_1), \ldots, \txt{properties}(m_{\mu}))  .
 \end{align*}
 
 \begin{equation*}
@@ -311,7 +311,7 @@ p(\params)  =& p(\underset{\#morphs}{\mu}) \times\\& p(\txt{properties}(m_1), \l
 
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Likelihood weighting and Semi-supervised training }
-Likelihood weighting with $\alpha$ \citep{kohonen2010semisupervised,virpioja2011nodalida}
+Likelihood weighting with $\alpha$ \citep{virpioja2011nodalida}
 \begin{align*}
   \cost(\params, \data) =& - \log p(\params) \\&- \alpha \log p(\data
   \vb \params)

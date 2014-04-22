@@ -177,19 +177,13 @@
 
 
   \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
- \begin{block}{Demo code}
-              \begin{itemize}
-              \item Written using the 
-                \begin{itemize}
-                \item rely on a very good initial alignment and illumination
-                \end{itemize}
-              \item We propose/analyze:
-                \begin{itemize}
-                \item grid-based and dense extraction of local features
-                \item block-based matching accounting for different\\
-	                  viewpoints and registration errors
-                \end{itemize}
-              \end{itemize}              
+ \begin{block}{Demo}
+	\begin{itemize}
+\item Build on top of library interface
+\item Will be available online in future
+
+\end{itemize}
+
             \end{block}
             
 	\end{beamercolorbox}
@@ -258,8 +252,8 @@ The experiments were performed using computer resources within the Aalto Univers
 \node[toolbox] (morfsegment) at (4,-8) {\texttt{morfessor- segment}};
 \node[toolbox] (morfevaluate) at (0,-8) {\texttt{morfessor- evaluate}};
 
-\node[resubox] (segmented) at (4,-10) {Segmented corpus};
-\node[resubox] (bprscore) at (0,-10) {BPR-scores};
+\node[resubox] (segmented) at (4,-11) {Segmented corpus};
+\node[resubox] (bprscore) at (0,-11) {boundary precision and recall scores};
 
 \draw[->] (traindata) to (traindata.south |- morftrain.north);
 \draw[->,dashed] (annodata) -- (annodata.south |- morftrain.north);
