@@ -7,6 +7,14 @@
   \usepackage[latin1]{inputenc}
   \usepackage{amsmath,amsthm, amssymb, latexsym}
   %\usepackage{times}\usefonttheme{professionalfonts}  % times is obsolete
+
+\DeclareRobustCommand{\AaltoLogoRandomize}[1][rby]{%
+\setcounter{aaltologo_color}{2}\gdef\AaltoLogoColor{aaltoBlue}%
+\setcounter{aaltologo_mark}{1}\gdef\AaltoLogoMark{?}%
+}
+
+
+
   \usefonttheme[onlymath]{serif}
   \boldmath
   \usepackage[orientation=landscape,size=a2,scale=1.0,grid,debug]{beamerposter}                       % e.g. for DIN-A0 poster
