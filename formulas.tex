@@ -140,7 +140,7 @@ The data ($\data$) is a list of (non-segmented) words to learn the model from in
             \end{block}
             
 	\end{beamercolorbox}
-
+\vspace{10mm}
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Data Likelihood}
 \begin{align*}
@@ -179,6 +179,7 @@ Morfessor selects only one tokenisation (analysis) for each word at a time, by i
 %p(\params) & = p(\underset{lexicon}{\lexicon})p(\underset{grammar}{\grammar})
 %\end{align*}
 
+\citep{creutz07acm}
 The parameters of Morfessor Baseline encode the properties of the morph lexicon:
 
 \begin{align*}
@@ -198,6 +199,7 @@ p(\params)  =& p(\underset{\#morphs}{\mu}) \times \underset{\#morph\,permutation
 
       \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{Algorithm}
+\citep{creutz02sigphon}
 \begin{algorithmic}
   \Function{LocalBatchTrain}{$\data$, $\epsilon$}
   \State $\params, \Y \gets \textsc{InitModel}(\data_W)$ 
@@ -340,7 +342,7 @@ For semi-supervised learning another term is added to the cost, the likelihood o
             \end{block}
 	\end{beamercolorbox}
 \vfill
-\vspace{23mm}
+\vspace{0mm}
   \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
  \begin{block}{References}
 \footnotesize
